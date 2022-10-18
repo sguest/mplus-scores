@@ -4,10 +4,13 @@ import AddCharacter from './AddCharacter';
 import { useEffect, useState } from 'react';
 import CharacterId from './CharacterId';
 import GetArmoryData from './GetArmoryData';
+import KeystoneDefinition from './KeystoneDefinition';
+import Keystone from './Keystone';
 
 function App() {
     const [dungeons, setDungeons] = useState<{[key: string]: string}>({})
     const [characters, setCharacters] = useState<CharacterId[]>([]);
+    const [newKeystone, setNewKeystone] = useState<KeystoneDefinition>({dungeon: '', level: 2, type: 'Fortified'});
 
     const charactersStateKey = 'characterList';
 
@@ -43,22 +46,27 @@ function App() {
     }
 
     return <>
-        {Object.keys(dungeons).length &&
+        {!!Object.keys(dungeons).length &&
             <table>
                 <thead>
                     <tr>
                         <th colSpan={2}></th>
                         {Object.values(dungeons).map(name => <th key={name}>{name}</th>)}
                         <th>Total</th>
+                        {!!newKeystone.dungeon && <th>Projected</th>}
                     </tr>
                 </thead>
                 {characters.map(character => <Character 
                     key={`${character.name}-${character.realm}-${character.region}`}
                     dungeonSlugs={Object.keys(dungeons)}
                     onDelete={() => onDeleteCharacter(character)}
-                    characterId={character} />)}
+                    characterId={character}
+                    newKeystone={newKeystone.dungeon ? newKeystone : undefined}/>)}
             </table>}
         <AddCharacter onCreate={onAddCharacter} />
+        {!!Object.keys(dungeons).length && 
+            <Keystone keystone={newKeystone} dungeons={dungeons} onChange={setNewKeystone} />
+        }
     </>
 }
 
