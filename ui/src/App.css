@@ -1,0 +1,12 @@
+td, th {
+  border: 1px solid #aaa;
+  padding: 3px;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+tbody {
+  border: 3px solid white;
+}
