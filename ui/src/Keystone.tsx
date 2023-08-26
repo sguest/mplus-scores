@@ -9,7 +9,8 @@ export interface KeystoneProps {
 export default function Keystone(props: KeystoneProps) {
     const types: Array<'Tyrannical' | 'Fortified'> = ['Fortified', 'Tyrannical']
 
-    return <div><>
+    return <div>
+        <h2>Estimate additional run</h2>
         <label>
             Dungeon
             <select value={props.keystone.dungeon} onChange={e => props.onChange({...props.keystone, dungeon: e.target.value})}>
@@ -22,5 +23,5 @@ export default function Keystone(props: KeystoneProps) {
             {type}
             <input type="radio" name="type" checked={props.keystone.type === type} onChange={() => props.onChange({...props.keystone, type })} />
         </label>)}
-    </></div>
+    </div>
 }

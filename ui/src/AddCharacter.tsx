@@ -10,7 +10,7 @@ export default function AddCharacter(props: AddCharacterProps) {
     const [realm, setRealm] = useState('');
     const [region, setRegion] = useState('US');
     return <form onSubmit={e => {e.preventDefault(); props.onCreate({ name, realm, region })}}>
-        Add Character<br />
+        <h2>Add Character</h2>
         <label>Name<input type="text" value={name} onChange={e => setName(e.target.value)} /></label><br />
         <label>Realm<input type="text" value={realm} onChange={e => setRealm(e.target.value)} /></label><br />
         <label>
