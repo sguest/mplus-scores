@@ -11,6 +11,7 @@ function App() {
     const [dungeons, setDungeons] = useState<{[key: string]: string}>({})
     const [characters, setCharacters] = useState<CharacterId[]>([]);
     const [newKeystone, setNewKeystone] = useState<KeystoneDefinition>({dungeon: '', level: 2, type: 'Fortified'});
+    const [showError, setShowError] = useState(false);
 
     const charactersStateKey = 'characterList';
 
@@ -23,12 +24,18 @@ function App() {
 
     useEffect(() => {
         if(characters.length) {
-            GetArmoryData(characters[0]).then(data => {
-                const dungeonData: {[key: string]: string} = {};
-                for(let dungeon of data.dungeons) {
-                    dungeonData[dungeon.dungeon.slug] = dungeon.dungeon.name;
+            GetArmoryData(characters[0]).then(response => {
+                if(response.success)
+                {
+                    const dungeonData: {[key: string]: string} = {};
+                    for(let dungeon of response.data.dungeons) {
+                        dungeonData[dungeon.dungeon.slug] = dungeon.dungeon.name;
+                    }
+                    setDungeons(dungeonData);
                 }
-                setDungeons(dungeonData);
+                else {
+                    setShowError(true);
+                }
             });
         }
     }, [characters]);
@@ -46,6 +53,11 @@ function App() {
     }
 
     return <>
+        {showError && <p>
+            Failed to load dungeon data. This app requires CORS requirements to be bypassed, likely by use of a browser extension.<br />
+            Possible extensions for <a target="_blank" href="https://addons.mozilla.org/en-CA/firefox/addon/cors-everywhere/">Firefox</a> or <a target="_blank" href="https://chrome.google.com/webstore/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino">Chrome</a><br />
+            See <a href="https://github.com/sguest/mplus-scores#cors">here</a> for more information.
+        </p>}
         {!!Object.keys(dungeons).length &&
             <table>
                 <thead>
@@ -63,7 +75,7 @@ function App() {
                     characterId={character}
                     newKeystone={newKeystone.dungeon ? newKeystone : undefined}/>)}
             </table>}
-        <AddCharacter onCreate={onAddCharacter} />
+        {!showError && <AddCharacter onCreate={onAddCharacter} />}
         {!!Object.keys(dungeons).length && 
             <Keystone keystone={newKeystone} dungeons={dungeons} onChange={setNewKeystone} />
         }

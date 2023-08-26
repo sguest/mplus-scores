@@ -73,56 +73,59 @@ export default function Character(props: CharacterProps) {
 
     useEffect(() => {
         GetArmoryData(props.characterId)
-        .then((data: MplusData) => {
-            let newDungeons: {[key: string]: Dungeon} = {};
-            data.dungeons.forEach(dungeon => {
-                const dungeonData: Dungeon = {
-                    slug: dungeon.dungeon.slug,
-                    rating: 0,
-                    ratingColour: '#777',
-                    level: 0,
-                    highRating: 0,
-                    highValue: 0,
-                    highType: '',
-                    highColour: '#777',
-                    lowRating: 0,
-                    lowValue: 0,
-                    lowType: '',
-                    lowColour: '#777',
-                    timeDifference: 0,
-                    timePercentage: 0,
-                };
+        .then(response => {
+            if(response.success)
+            {
+                let newDungeons: {[key: string]: Dungeon} = {};
+                response.data.dungeons.forEach(dungeon => {
+                    const dungeonData: Dungeon = {
+                        slug: dungeon.dungeon.slug,
+                        rating: 0,
+                        ratingColour: '#777',
+                        level: 0,
+                        highRating: 0,
+                        highValue: 0,
+                        highType: '',
+                        highColour: '#777',
+                        lowRating: 0,
+                        lowValue: 0,
+                        lowType: '',
+                        lowColour: '#777',
+                        timeDifference: 0,
+                        timePercentage: 0,
+                    };
 
-                if(dungeon.modifiers) {
-                    dungeonData.highType = dungeon.modifiers.find(m => m.name === 'Fortified' || m.name === 'Tyrannical')!.name;
-                    dungeonData.lowType = dungeonData.highType === 'Fortified' ? 'Tyrannical' : 'Fortified';
-                    dungeonData.highValue = dungeon.dungeonRating.rating * 1.5;
-                    dungeonData.lowValue = dungeon.mapRating.rating - dungeonData.highValue;
-                    dungeonData.lowRating = dungeonData.lowValue * 2;
+                    if(dungeon.modifiers) {
+                        dungeonData.highType = dungeon.modifiers.find(m => m.name === 'Fortified' || m.name === 'Tyrannical')!.name;
+                        dungeonData.lowType = dungeonData.highType === 'Fortified' ? 'Tyrannical' : 'Fortified';
+                        dungeonData.highValue = dungeon.dungeonRating.rating * 1.5;
+                        dungeonData.lowValue = dungeon.mapRating.rating - dungeonData.highValue;
+                        dungeonData.lowRating = dungeonData.lowValue * 2;
 
-                    for(let cutoff in dungeonRatingCutoffs) {
-                        if(dungeonData.lowRating >= +cutoff) {
-                            dungeonData.lowColour = dungeonRatingCutoffs[cutoff];
+                        for(let cutoff in dungeonRatingCutoffs) {
+                            if(dungeonData.lowRating >= +cutoff) {
+                                dungeonData.lowColour = dungeonRatingCutoffs[cutoff];
+                            }
                         }
+
+                        setCharacterClass(dungeon.party.find(p => !p.name.localeCompare(characterId.name, undefined, {sensitivity: 'accent'}) &&
+                            !p.realm.name.localeCompare(characterId.realm, undefined, {sensitivity: 'accent'}) &&
+                            !p.region.localeCompare(characterId.region, undefined, { sensitivity: 'accent'}))?.class.slug);
+                        dungeonData.slug = dungeon.dungeon.slug;
+                        dungeonData.rating = dungeon.mapRating.rating;
+                        dungeonData.ratingColour = getRgba(dungeon.mapRating.color);
+                        dungeonData.level = dungeon.level;
+                        dungeonData.highRating = dungeon.dungeonRating.rating;
+                        dungeonData.highColour = getRgba(dungeon.dungeonRating.color);
+
+                        dungeonData.timeDifference = dungeon.qualifyingDuration - dungeon.duration;
+                        dungeonData.timePercentage = Math.floor(Math.abs(dungeonData.timeDifference / dungeon.qualifyingDuration) * 1000) / 10;
                     }
 
-                    setCharacterClass(dungeon.party.find(p => !p.name.localeCompare(characterId.name, undefined, {sensitivity: 'accent'}) &&
-                        !p.realm.name.localeCompare(characterId.realm, undefined, {sensitivity: 'accent'}) &&
-                        !p.region.localeCompare(characterId.region, undefined, { sensitivity: 'accent'}))?.class.slug);
-                    dungeonData.slug = dungeon.dungeon.slug;
-                    dungeonData.rating = dungeon.mapRating.rating;
-                    dungeonData.ratingColour = getRgba(dungeon.mapRating.color);
-                    dungeonData.level = dungeon.level;
-                    dungeonData.highRating = dungeon.dungeonRating.rating;
-                    dungeonData.highColour = getRgba(dungeon.dungeonRating.color);
-
-                    dungeonData.timeDifference = dungeon.qualifyingDuration - dungeon.duration;
-                    dungeonData.timePercentage = Math.floor(Math.abs(dungeonData.timeDifference / dungeon.qualifyingDuration) * 1000) / 10;
-                }
-
-                newDungeons[dungeonData.slug] = dungeonData;
-            });
-            setDungeons(newDungeons);
+                    newDungeons[dungeonData.slug] = dungeonData;
+                });
+                setDungeons(newDungeons);
+            }
         })
     }, [dungeonSlugs, characterId]);
 
