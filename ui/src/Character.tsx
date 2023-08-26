@@ -157,15 +157,28 @@ export default function Character(props: CharacterProps) {
 
     if(props.newKeystone?.dungeon && dungeons[props.newKeystone.dungeon]) {
         let rating = 30 + 5 * props.newKeystone.level;
-        if(props.newKeystone.level >= 4) {
-            rating += 5;
-        }
         if(props.newKeystone.level >= 7) {
             rating += 5;
         }
-        if(props.newKeystone.level >= 10) {
+        if(props.newKeystone.level >= 14) {
+            rating += 5;
+        }
+        if(props.newKeystone.level >= 20) {
             rating += 10;
         }
+
+        if(props.newKeystone.percentTime >= 140) {
+            rating = 0;
+        }
+        else if(props.newKeystone.percentTime > 100) {
+            rating -= 15 * (props.newKeystone.percentTime - 100) / 100
+        }
+        else {
+            const bonusTime = Math.min(0.4, (100 - props.newKeystone.percentTime) / 100);
+            rating += 7.5 * bonusTime;
+        }
+
+        rating = Math.floor(rating);
 
         const targetDungeon = dungeons[props.newKeystone.dungeon];
 

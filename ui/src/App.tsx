@@ -6,11 +6,12 @@ import CharacterId from './CharacterId';
 import GetArmoryData from './GetArmoryData';
 import KeystoneDefinition from './KeystoneDefinition';
 import Keystone from './Keystone';
+import { Dungeon } from './MplusData';
 
 function App() {
-    const [dungeons, setDungeons] = useState<{[key: string]: string}>({})
+    const [dungeons, setDungeons] = useState<{[key: string]: Dungeon}>({})
     const [characters, setCharacters] = useState<CharacterId[]>([]);
-    const [newKeystone, setNewKeystone] = useState<KeystoneDefinition>({dungeon: '', level: 2, type: 'Fortified'});
+    const [newKeystone, setNewKeystone] = useState<KeystoneDefinition>({dungeon: '', level: 2, type: 'Fortified', elapsedSeconds: 0, elapsedMinutes: 0, percentTime: 0});
     const [showError, setShowError] = useState(false);
 
     const charactersStateKey = 'characterList';
@@ -27,9 +28,9 @@ function App() {
             GetArmoryData(characters[0]).then(response => {
                 if(response.success)
                 {
-                    const dungeonData: {[key: string]: string} = {};
+                    const dungeonData: {[key: string]: Dungeon} = {};
                     for(let dungeon of response.data.dungeons) {
-                        dungeonData[dungeon.dungeon.slug] = dungeon.dungeon.name;
+                        dungeonData[dungeon.dungeon.slug] = dungeon;
                     }
                     setDungeons(dungeonData);
                 }
@@ -63,7 +64,7 @@ function App() {
                 <thead>
                     <tr>
                         <th colSpan={2}></th>
-                        {Object.values(dungeons).map(name => <th key={name}>{name}</th>)}
+                        {Object.values(dungeons).map(dungeon => <th key={dungeon.dungeon.name}>{dungeon.dungeon.name}</th>)}
                         <th>Total</th>
                         {!!newKeystone.dungeon && <th>Projected</th>}
                     </tr>
@@ -76,9 +77,9 @@ function App() {
                     newKeystone={newKeystone.dungeon ? newKeystone : undefined}/>)}
             </table>}
         {!showError && <AddCharacter onCreate={onAddCharacter} />}
-        {!!Object.keys(dungeons).length && 
+        {/*!!Object.keys(dungeons).length && 
             <Keystone keystone={newKeystone} dungeons={dungeons} onChange={setNewKeystone} />
-        }
+        */}
     </>
 }
 
