@@ -4,9 +4,9 @@
 name: Build and deploy Node.js project to Azure Function App - wow-armory-proxy
 
 on:
-  push:
-    branches:
-      - master
+  # push:
+  #   branches:
+  #     - master
   workflow_dispatch:
 
 env:
